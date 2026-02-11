@@ -1,0 +1,267 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionTier {
+  FREE
+  PREMIUM
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+  INCOMPLETE
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+}
+
+enum WorkflowStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILED
+  CANCELED
+}
+
+model User {
+  id                String    @id @default(uuid())
+  email             String    @unique
+  password          String
+  name              String?
+  avatar            String?
+  emailVerified     Boolean   @default(false)
+  stripeCustomerId  String?   @unique
+  
+  subscriptionTier  SubscriptionTier @default(FREE)
+  subscription      Subscription?
+  
+  credits           Credit?
+  creditTransactions CreditTransaction[]
+  
+  workflows         Workflow[]
+  executions        Execution[]
+  apiKeys           ApiKey[]
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  lastLoginAt       DateTime?
+  
+  @@index([email])
+  @@map("users")
+}
+
+model Subscription {
+  id                    String              @id @default(uuid())
+  userId                String              @unique
+  user                  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  stripeSubscriptionId  String?             @unique
+  tier                  SubscriptionTier    @default(FREE)
+  status                SubscriptionStatus  @default(ACTIVE)
+  
+  currentPeriodStart    DateTime?
+  currentPeriodEnd      DateTime?
+  cancelAtPeriodEnd     Boolean             @default(false)
+  canceledAt            DateTime?
+  
+  trialStart            DateTime?
+  trialEnd              DateTime?
+  
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  
+  @@index([userId])
+  @@index([stripeSubscriptionId])
+  @@map("subscriptions")
+}
+
+model Credit {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  balance   Float    @default(0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+  @@map("credits")
+}
+
+model CreditTransaction {
+  id            String          @id @default(uuid())
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type          TransactionType
+  amount        Float
+  balanceAfter  Float
+  
+  reason        String?
+  source        String?
+  metadata      Json?
+  
+  stripePaymentId String?       @unique
+  
+  createdAt     DateTime        @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@map("credit_transactions")
+}
+
+model Workflow {
+  id          String         @id @default(uuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name        String
+  description String?
+  status      WorkflowStatus @default(DRAFT)
+  
+  nodes       Json           @default("[]")
+  connections Json           @default("[]")
+  config      Json?
+  
+  version     Int            @default(1)
+  isTemplate  Boolean        @default(false)
+  templateId  String?
+  
+  executions  Execution[]
+  
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  deployedAt  DateTime?
+  
+  @@index([userId])
+  @@index([status])
+  @@map("workflows")
+}
+
+model Execution {
+  id          String          @id @default(uuid())
+  workflowId  String
+  workflow    Workflow        @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  status      ExecutionStatus @default(PENDING)
+  
+  input       Json?
+  output      Json?
+  error       String?
+  
+  startedAt   DateTime        @default(now())
+  completedAt DateTime?
+  duration    Int?            // milliseconds
+  
+  nodesExecuted Int           @default(0)
+  creditsUsed   Float         @default(0)
+  
+  logs        Json            @default("[]")
+  
+  @@index([workflowId])
+  @@index([userId])
+  @@index([status])
+  @@index([startedAt])
+  @@map("executions")
+}
+
+model ApiKey {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  provider   String   // openai, anthropic, google, openclaw
+  keyHash    String   // encrypted
+  
+  lastUsedAt DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  @@unique([userId, provider])
+  @@index([userId])
+  @@map("api_keys")
+}
+
+model PaymentMethod {
+  id                String   @id @default(uuid())
+  userId            String
+  
+  stripePaymentMethodId String @unique
+  
+  brand             String
+  last4             String
+  expMonth          Int
+  expYear           Int
+  
+  isDefault         Boolean  @default(false)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([userId])
+  @@map("payment_methods")
+}
+
+model Invoice {
+  id              String   @id @default(uuid())
+  userId          String
+  
+  stripeInvoiceId String   @unique
+  
+  amount          Float
+  currency        String   @default("usd")
+  status          String   // paid, pending, failed
+  
+  description     String?
+  pdfUrl          String?
+  
+  periodStart     DateTime?
+  periodEnd       DateTime?
+  
+  createdAt       DateTime @default(now())
+  paidAt          DateTime?
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@map("invoices")
+}
+
+model UsageLog {
+  id          String   @id @default(uuid())
+  userId      String
+  workflowId  String?
+  
+  resourceType String  // workflow_execution, api_call_openai, etc
+  amount       Float
+  creditsCharged Float
+  
+  metadata    Json?
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@map("usage_logs")
+}
