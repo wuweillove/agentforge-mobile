@@ -1,69 +1,68 @@
 version: '3.8'
 
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14-alpine
+    container_name: agentforge-db
+    environment:
+      POSTGRES_DB: agentforge
+      POSTGRES_USER: agentforge
+      POSTGRES_PASSWORD: agentforge_dev_password
     ports:
-      - '3000:3000'
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/agentforge
-      - REDIS_URL=redis://redis:6379
-    env_file:
-      - .env
-    depends_on:
-      - db
-      - redis
-    restart: unless-stopped
-    networks:
-      - agentforge
-
-  db:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=agentforge
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./prisma/schema.sql:/docker-entrypoint-initdb.d/schema.sql
-    ports:
-      - '5432:5432'
-    restart: unless-stopped
-    networks:
-      - agentforge
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/2-seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentforge"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # Redis Cache
   redis:
     image: redis:7-alpine
+    container_name: agentforge-redis
     ports:
-      - '6379:6379'
+      - "6379:6379"
     volumes:
       - redis_data:/data
-    restart: unless-stopped
-    networks:
-      - agentforge
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
-  # Prisma Studio for database management
-  prisma-studio:
+  # API Server
+  api:
     build:
       context: .
       dockerfile: Dockerfile
-    command: npx prisma studio
+    container_name: agentforge-api
     ports:
-      - '5555:5555'
+      - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/agentforge
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://agentforge:agentforge_dev_password@postgres:5432/agentforge
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev_jwt_secret_change_in_production
+      JWT_EXPIRES_IN: 24h
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      ADMIN_EMAIL: admin@agentforge.io
+      LOG_LEVEL: debug
     depends_on:
-      - db
-    networks:
-      - agentforge
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
 
 volumes:
   postgres_data:
   redis_data:
-
-networks:
-  agentforge:
-    driver: bridge
