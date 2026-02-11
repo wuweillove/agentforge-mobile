@@ -1,139 +1,109 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const STORAGE_KEYS = {
-  WORKFLOWS: '@agentforge:workflows',
-  API_KEY: '@agentforge:api_key',
-  SETTINGS: '@agentforge:settings',
-  USER_DATA: '@agentforge:user_data',
+  WORKFLOWS: '@agentforge_workflows',
+  USER_PROFILE: '@agentforge_user',
+  SETTINGS: '@agentforge_settings',
+  CREDITS: '@agentforge_credits',
+  SUBSCRIPTION: '@agentforge_subscription',
 };
 
 class StorageService {
-  // Workflows
-  async saveWorkflows(workflows) {
+  // Generic methods
+  async setItem(key, value) {
     try {
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.WORKFLOWS,
-        JSON.stringify(workflows)
-      );
-      return { success: true };
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem(key, jsonValue);
+      return true;
     } catch (error) {
-      console.error('Error saving workflows:', error);
-      return { success: false, error };
+      console.error('Error saving to storage:', error);
+      return false;
     }
   }
 
-  async getWorkflows() {
+  async getItem(key) {
     try {
-      const data = await AsyncStorage.getItem(STORAGE_KEYS.WORKFLOWS);
-      return data ? JSON.parse(data) : [];
+      const jsonValue = await AsyncStorage.getItem(key);
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
     } catch (error) {
-      console.error('Error loading workflows:', error);
-      return [];
-    }
-  }
-
-  async clearWorkflows() {
-    try {
-      await AsyncStorage.removeItem(STORAGE_KEYS.WORKFLOWS);
-      return { success: true };
-    } catch (error) {
-      console.error('Error clearing workflows:', error);
-      return { success: false, error };
-    }
-  }
-
-  // API Key
-  async saveApiKey(apiKey) {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEYS.API_KEY, apiKey);
-      return { success: true };
-    } catch (error) {
-      console.error('Error saving API key:', error);
-      return { success: false, error };
-    }
-  }
-
-  async getApiKey() {
-    try {
-      return await AsyncStorage.getItem(STORAGE_KEYS.API_KEY);
-    } catch (error) {
-      console.error('Error loading API key:', error);
+      console.error('Error reading from storage:', error);
       return null;
     }
   }
 
-  async deleteApiKey() {
+  async removeItem(key) {
     try {
-      await AsyncStorage.removeItem(STORAGE_KEYS.API_KEY);
-      return { success: true };
+      await AsyncStorage.removeItem(key);
+      return true;
     } catch (error) {
-      console.error('Error deleting API key:', error);
-      return { success: false, error };
+      console.error('Error removing from storage:', error);
+      return false;
     }
+  }
+
+  async clear() {
+    try {
+      await AsyncStorage.clear();
+      return true;
+    } catch (error) {
+      console.error('Error clearing storage:', error);
+      return false;
+    }
+  }
+
+  // Workflows
+  async saveWorkflows(workflows) {
+    return await this.setItem(STORAGE_KEYS.WORKFLOWS, workflows);
+  }
+
+  async getWorkflows() {
+    const workflows = await this.getItem(STORAGE_KEYS.WORKFLOWS);
+    return workflows || [];
+  }
+
+  // User Profile
+  async saveUserProfile(profile) {
+    return await this.setItem(STORAGE_KEYS.USER_PROFILE, profile);
+  }
+
+  async getUserProfile() {
+    return await this.getItem(STORAGE_KEYS.USER_PROFILE);
   }
 
   // Settings
   async saveSettings(settings) {
-    try {
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.SETTINGS,
-        JSON.stringify(settings)
-      );
-      return { success: true };
-    } catch (error) {
-      console.error('Error saving settings:', error);
-      return { success: false, error };
-    }
+    return await this.setItem(STORAGE_KEYS.SETTINGS, settings);
   }
 
   async getSettings() {
-    try {
-      const data = await AsyncStorage.getItem(STORAGE_KEYS.SETTINGS);
-      return data ? JSON.parse(data) : {};
-    } catch (error) {
-      console.error('Error loading settings:', error);
-      return {};
-    }
+    const defaultSettings = {
+      autoSave: true,
+      notifications: true,
+      darkMode: true,
+      biometricAuth: false,
+    };
+    const settings = await this.getItem(STORAGE_KEYS.SETTINGS);
+    return settings || defaultSettings;
   }
 
-  // User Data
-  async saveUserData(userData) {
-    try {
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.USER_DATA,
-        JSON.stringify(userData)
-      );
-      return { success: true };
-    } catch (error) {
-      console.error('Error saving user data:', error);
-      return { success: false, error };
-    }
+  // Credits
+  async saveCredits(credits) {
+    return await this.setItem(STORAGE_KEYS.CREDITS, credits);
   }
 
-  async getUserData() {
-    try {
-      const data = await AsyncStorage.getItem(STORAGE_KEYS.USER_DATA);
-      return data ? JSON.parse(data) : null;
-    } catch (error) {
-      console.error('Error loading user data:', error);
-      return null;
-    }
+  async getCredits() {
+    const credits = await this.getItem(STORAGE_KEYS.CREDITS);
+    return credits || { balance: 0, history: [] };
   }
 
-  // Clear all data
-  async clearAll() {
-    try {
-      await AsyncStorage.multiRemove([
-        STORAGE_KEYS.WORKFLOWS,
-        STORAGE_KEYS.API_KEY,
-        STORAGE_KEYS.SETTINGS,
-        STORAGE_KEYS.USER_DATA,
-      ]);
-      return { success: true };
-    } catch (error) {
-      console.error('Error clearing all data:', error);
-      return { success: false, error };
-    }
+  // Subscription
+  async saveSubscription(subscription) {
+    return await this.setItem(STORAGE_KEYS.SUBSCRIPTION, subscription);
+  }
+
+  async getSubscription() {
+    const subscription = await this.getItem(STORAGE_KEYS.SUBSCRIPTION);
+    return subscription || { tier: 'free', status: 'active' };
   }
 }
 

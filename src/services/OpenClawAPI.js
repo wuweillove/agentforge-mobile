@@ -1,75 +1,74 @@
 import axios from 'axios';
-import Constants from 'expo-constants';
+import { getApiKey } from './SecureStorage';
 
-const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || 'https://api.openclaw.io';
+const API_BASE_URL = 'https://api.openclaw.io/v1';
 
 class OpenClawAPI {
   constructor() {
     this.client = axios.create({
-      baseURL: `${API_BASE_URL}/v1`,
+      baseURL: API_BASE_URL,
       timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
-    this.apiKey = null;
-  }
+    // Request interceptor to add auth token
+    this.client.interceptors.request.use(
+      async (config) => {
+        const apiKey = await getApiKey('openclaw');
+        if (apiKey) {
+          config.headers.Authorization = `Bearer ${apiKey}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
 
-  setApiKey(apiKey) {
-    this.apiKey = apiKey;
-    this.client.defaults.headers.common['Authorization'] = `Bearer ${apiKey}`;
+    // Response interceptor for error handling
+    this.client.interceptors.response.use(
+      (response) => response.data,
+      (error) => {
+        const errorMessage = error.response?.data?.message || error.message;
+        return Promise.reject(new Error(errorMessage));
+      }
+    );
   }
 
   // Workflow Management
   async deployWorkflow(workflow) {
     try {
-      const response = await this.client.post('/workflows', {
-        name: workflow.name,
-        description: workflow.description,
-        nodes: workflow.nodes,
-        connections: workflow.connections,
-        config: workflow.config,
-      });
-      return { success: true, data: response.data };
+      const response = await this.client.post('/workflows', workflow);
+      return response;
     } catch (error) {
-      return { success: false, error: this.handleError(error) };
+      throw new Error(`Failed to deploy workflow: ${error.message}`);
     }
   }
 
   async getWorkflow(workflowId) {
     try {
       const response = await this.client.get(`/workflows/${workflowId}`);
-      return { success: true, data: response.data };
+      return response;
     } catch (error) {
-      return { success: false, error: this.handleError(error) };
+      throw new Error(`Failed to fetch workflow: ${error.message}`);
     }
   }
 
   async updateWorkflow(workflowId, updates) {
     try {
       const response = await this.client.put(`/workflows/${workflowId}`, updates);
-      return { success: true, data: response.data };
+      return response;
     } catch (error) {
-      return { success: false, error: this.handleError(error) };
+      throw new Error(`Failed to update workflow: ${error.message}`);
     }
   }
 
   async deleteWorkflow(workflowId) {
     try {
       await this.client.delete(`/workflows/${workflowId}`);
-      return { success: true };
+      return true;
     } catch (error) {
-      return { success: false, error: this.handleError(error) };
-    }
-  }
-
-  async listWorkflows() {
-    try {
-      const response = await this.client.get('/workflows');
-      return { success: true, data: response.data };
-    } catch (error) {
-      return { success: false, error: this.handleError(error) };
+      throw new Error(`Failed to delete workflow: ${error.message}`);
     }
   }
 
@@ -79,92 +78,69 @@ class OpenClawAPI {
       const response = await this.client.post(`/workflows/${workflowId}/execute`, {
         input,
       });
-      return { success: true, data: response.data };
+      return response;
     } catch (error) {
-      return { success: false, error: this.handleError(error) };
+      throw new Error(`Failed to execute workflow: ${error.message}`);
     }
   }
 
   async getExecutionStatus(executionId) {
     try {
       const response = await this.client.get(`/executions/${executionId}`);
-      return { success: true, data: response.data };
+      return response;
     } catch (error) {
-      return { success: false, error: this.handleError(error) };
+      throw new Error(`Failed to fetch execution status: ${error.message}`);
     }
   }
 
-  async stopExecution(executionId) {
+  async getExecutionLogs(executionId) {
     try {
-      await this.client.post(`/executions/${executionId}/stop`);
-      return { success: true };
+      const response = await this.client.get(`/executions/${executionId}/logs`);
+      return response;
     } catch (error) {
-      return { success: false, error: this.handleError(error) };
+      throw new Error(`Failed to fetch execution logs: ${error.message}`);
     }
   }
 
   // Monitoring
-  async getExecutionLogs(executionId) {
-    try {
-      const response = await this.client.get(`/executions/${executionId}/logs`);
-      return { success: true, data: response.data };
-    } catch (error) {
-      return { success: false, error: this.handleError(error) };
-    }
-  }
-
-  async getMetrics(workflowId, timeRange = '24h') {
+  async getAgentMetrics(workflowId, timeRange = '24h') {
     try {
       const response = await this.client.get(`/workflows/${workflowId}/metrics`, {
         params: { timeRange },
       });
-      return { success: true, data: response.data };
+      return response;
     } catch (error) {
-      return { success: false, error: this.handleError(error) };
+      throw new Error(`Failed to fetch metrics: ${error.message}`);
+    }
+  }
+
+  async listExecutions(workflowId, limit = 50) {
+    try {
+      const response = await this.client.get(`/workflows/${workflowId}/executions`, {
+        params: { limit },
+      });
+      return response;
+    } catch (error) {
+      throw new Error(`Failed to list executions: ${error.message}`);
     }
   }
 
   // Templates
-  async listTemplates(category = null) {
+  async getTemplates() {
     try {
-      const params = category ? { category } : {};
-      const response = await this.client.get('/templates', { params });
-      return { success: true, data: response.data };
+      const response = await this.client.get('/templates');
+      return response;
     } catch (error) {
-      return { success: false, error: this.handleError(error) };
+      throw new Error(`Failed to fetch templates: ${error.message}`);
     }
   }
 
-  async getTemplate(templateId) {
+  async saveTemplate(template) {
     try {
-      const response = await this.client.get(`/templates/${templateId}`);
-      return { success: true, data: response.data };
+      const response = await this.client.post('/templates', template);
+      return response;
     } catch (error) {
-      return { success: false, error: this.handleError(error) };
-    }
-  }
-
-  // Error Handling
-  handleError(error) {
-    if (error.response) {
-      // Server responded with error
-      return {
-        message: error.response.data.message || 'Server error',
-        status: error.response.status,
-        data: error.response.data,
-      };
-    } else if (error.request) {
-      // Request made but no response
-      return {
-        message: 'No response from server',
-        status: 0,
-      };
-    } else {
-      // Error in request setup
-      return {
-        message: error.message || 'Request failed',
-        status: -1,
-      };
+      throw new Error(`Failed to save template: ${error.message}`);
     }
   }
 }
