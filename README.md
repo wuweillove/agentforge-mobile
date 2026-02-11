@@ -1,284 +1,223 @@
-# AgentForge Mobile
+# AgentForge - Complete Production-Ready Platform
 
-**Visual workflow builder for autonomous agents with OpenClaw integration + Complete Monetization System**
+**Visual workflow builder for autonomous AI agents with integrated monetization system**
 
-AgentForge is a comprehensive React Native mobile application that enables users to create, manage, and monitor AI agent workflows with an intuitive drag-and-drop interface. Built with OpenClaw integration for powerful agent orchestration and a complete monetization system including subscriptions, credits, and secure payment processing.
+A comprehensive React Native mobile app with Node.js/TypeScript backend, featuring workflow creation, AI agent management, real-time monitoring, and complete payment processing.
 
-## 🚀 Features
+## 🚀 Complete System Overview
 
-### 🎨 Visual Workflow Builder
-- Drag-and-drop node-based interface
-- Real-time workflow validation
-- Multiple node types: Input, Process, Decision, Output, API Call, AI Agent
-- Connection management with automatic routing
-- Zoom and pan canvas controls
-- Node configuration and customization
+### Frontend (React Native Mobile App)
+- ✅ **Visual Workflow Builder** - Drag-and-drop node-based interface
+- ✅ **Template System** - Pre-built workflows and custom templates
+- ✅ **Real-time Monitoring** - Live agent execution tracking
+- ✅ **API Key Management** - Secure encrypted storage
+- ✅ **Credit System** - Purchase and track credits
+- ✅ **Subscription Management** - 3-tier pricing (Free/Premium/Enterprise)
+- ✅ **Payment Processing** - Stripe integration
+- ✅ **Admin Dashboard** - Analytics and user management
 
-### 📋 Template System
-- Pre-built workflow templates
-- Custom template creation
-- Template categories (Data Processing, Communication, Analysis, Automation)
-- One-tap template deployment
-- Template sharing and importing
+### Backend (Node.js/TypeScript API)
+- ✅ **RESTful API** - Complete Express.js server
+- ✅ **PostgreSQL Database** - Prisma ORM with migrations
+- ✅ **Redis Caching** - Performance optimization
+- ✅ **JWT Authentication** - Secure user sessions
+- ✅ **Stripe Integration** - Payments and webhooks
+- ✅ **Rate Limiting** - DDoS protection
+- ✅ **Logging & Monitoring** - Winston logger
+- ✅ **Docker Support** - Easy deployment
 
-### 📊 Real-time Monitoring
-- Live agent execution dashboard
-- Performance metrics and analytics
-- Error tracking and logging
-- Execution history
-- Resource usage tracking
-
-### 🔧 OpenClaw Integration
-- Direct API integration with OpenClaw platform
-- Agent deployment and management
-- Real-time status updates
-- Configuration synchronization
-- Workflow version control
-
-### 💰 Monetization System
-
-#### Subscription Plans
-- **Free**: 3 workflows, 10 nodes/workflow, 100 API calls/month
-- **Premium ($9.99/mo)**: Unlimited workflows, 50 nodes/workflow, 10K API calls/month
-- **Enterprise ($49.99/mo)**: Unlimited everything + team collaboration
-
-#### Credit System
-- Purchase credit packages (100 - 5,000 credits)
-- Pay-as-you-go for usage beyond subscription limits
-- Bonus credits on larger packages
-- Never-expiring credits
-- Real-time usage tracking
-
-#### API Key Management
-- Secure encrypted storage for AI provider keys
-- Support for OpenAI, Anthropic, Google AI, OpenClaw
-- Biometric authentication protection
-- Key validation and format checking
-- Easy provider switching
-
-#### Payment Processing
-- Stripe integration for all transactions
-- Credit/debit card support
-- Apple Pay & Google Pay ready
-- Secure payment method storage
-- Invoice generation and history
-- Automatic subscription renewal
-
-#### Admin Dashboard
-- Revenue analytics and reporting
-- User management and insights
-- Transaction monitoring
-- Subscription metrics (MRR, churn, etc.)
-- Credit usage analytics
-
-## 🛠 Tech Stack
-
-### Mobile App
-- **Framework**: React Native (Expo ~50.0.0)
-- **Navigation**: React Navigation v6
-- **State Management**: Zustand
-- **UI Components**: React Native Paper
-- **Storage**: AsyncStorage + Expo SecureStore
-- **API Client**: Axios
-- **Graphics**: React Native SVG
-- **Payments**: Stripe React Native SDK
-- **Authentication**: Expo Local Authentication (Biometric)
-- **Security**: Crypto-JS for encryption
-
-### Backend Requirements
-- **Runtime**: Node.js 18+
-- **Database**: PostgreSQL 14+
-- **Cache**: Redis 7+
-- **Payments**: Stripe API
-- **Authentication**: JWT
-
-## 📋 Prerequisites
-
-- Node.js 18+ and npm/yarn
-- Expo CLI: `npm install -g expo-cli`
-- iOS Simulator (Mac) or Android Studio (for emulators)
-- Expo Go app on physical device (optional)
-- Stripe account for payment processing
-- PostgreSQL and Redis for backend (see BACKEND.md)
-
-## 🚀 Installation
-
-### 1. Clone the repository
-```bash
-git clone https://github.com/wuweillove/agentforge-mobile.git
-cd agentforge-mobile
-```
-
-### 2. Install dependencies
-```bash
-npm install
-```
-
-### 3. Configure environment
-
-Create a `.env` file in the root directory:
-```env
-# API Configuration
-OPENCLAW_API_URL=https://api.openclaw.io
-OPENCLAW_API_KEY=your_openclaw_api_key
-
-# Backend API
-API_BASE_URL=https://api.agentforge.io
-# or for local development:
-# API_BASE_URL=http://localhost:3000/api
-
-# Stripe (use test keys for development)
-STRIPE_PUBLISHABLE_KEY=pk_test_...
-```
-
-### 4. Start the development server
-```bash
-npm start
-```
-
-## 📱 Running the App
-
-### iOS Simulator
-```bash
-npm run ios
-```
-
-### Android Emulator
-```bash
-npm run android
-```
-
-### Expo Go (Physical Device)
-1. Install Expo Go from App Store or Google Play
-2. Scan the QR code from the terminal
-
-### Web Browser
-```bash
-npm run web
-```
-
-## 📁 Project Structure
+## 📦 Repository Structure
 
 ```
 agentforge-mobile/
-├── src/
-│   ├── components/          # Reusable UI components
-│   │   ├── WorkflowCanvas.js     # Main workflow canvas
-│   │   ├── NodePalette.js        # Node selection palette
-│   │   ├── AgentNode.js          # Individual workflow node
-│   │   ├── TemplateCard.js       # Template display card
-│   │   └── DashboardMetrics.js   # Metrics dashboard
-│   ├── screens/             # App screens
-│   │   ├── HomeScreen.js              # Dashboard home
-│   │   ├── WorkflowBuilderScreen.js  # Workflow editor
-│   │   ├── TemplatesScreen.js         # Template library
-│   │   ├── MonitorScreen.js           # Agent monitoring
-│   │   ├── SettingsScreen.js          # App settings
-│   │   ├── APIKeysScreen.js           # API key management
-│   │   ├── CreditsScreen.js           # Credit purchase & history
-│   │   ├── SubscriptionScreen.js      # Subscription management
-│   │   ├── PaymentScreen.js           # Payment methods
-│   │   └── AdminDashboardScreen.js    # Admin analytics
-│   ├── navigation/          # Navigation configuration
-│   │   └── AppNavigator.js       # Main navigator
-│   ├── services/            # API and data services
-│   │   ├── OpenClawAPI.js        # OpenClaw API client
-│   │   ├── StorageService.js     # Local storage
-│   │   ├── SecureStorage.js      # Encrypted key storage
-│   │   ├── StripePayments.js     # Payment processing
-│   │   ├── AuthService.js        # Authentication
-│   │   └── CreditService.js      # Credit management
-│   ├── store/               # State management
-│   │   ├── workflowStore.js      # Workflow state
-│   │   └── userStore.js          # User & subscription state
-│   └── utils/               # Utility functions
-│       ├── constants.js          # App constants
-│       └── helpers.js            # Helper functions
-├── assets/                  # Images and icons
-├── App.js                   # App entry point
-├── app.json                 # Expo configuration
-├── package.json             # Dependencies
-├── MONETIZATION.md          # Monetization guide
-└── BACKEND.md              # Backend API docs
+├── mobile/                          # React Native mobile app
+│   ├── src/
+│   │   ├── components/              # UI components
+│   │   ├── screens/                 # App screens (10 screens)
+│   │   ├── navigation/              # React Navigation
+│   │   ├── services/                # API clients
+│   │   ├── store/                   # Zustand state management
+│   │   └── utils/                   # Helper functions
+│   ├── App.js                       # App entry point
+│   ├── app.json                     # Expo configuration
+│   └── package.json                 # Dependencies
+│
+├── backend/                         # Node.js/TypeScript API
+│   ├── src/
+│   │   ├── config/                  # Configuration
+│   │   ├── controllers/             # Request handlers
+│   │   ├── middleware/              # Auth, validation, etc.
+│   │   ├── routes/                  # API routes
+│   │   ├── services/                # Business logic
+│   │   ├── utils/                   # Utilities
+│   │   └── server.ts                # Express setup
+│   ├── prisma/
+│   │   ├── schema.prisma            # Database schema
+│   │   └── seed.ts                  # Database seeding
+│   ├── Dockerfile                   # Docker configuration
+│   ├── docker-compose.yml           # Docker Compose setup
+│   └── package.json                 # Dependencies
+│
+├── docs/
+│   ├── BACKEND_COMPLETE.md          # Backend documentation
+│   ├── MONETIZATION.md              # Revenue guide
+│   └── API.md                       # API documentation
+│
+└── README.md                        # This file
 ```
 
-## 🎯 Usage Guide
+## 🎯 Features
 
-### Creating a Workflow
+### Mobile App Features
 
-1. **Navigate to Workflow Builder**
-   - Tap the "Workflow" tab or "New Workflow" button
+#### 1. Workflow Builder
+- **6 Node Types**: Input, Process, Decision, API Call, AI Agent, Output
+- **Drag & Drop**: Intuitive canvas interface
+- **Real-time Validation**: Instant feedback
+- **Auto-save**: Never lose your work
+- **Templates**: Start from pre-built workflows
 
-2. **Add Nodes**
-   - Tap the + button to open the node palette
-   - Select a node type (Input, Process, Decision, API Call, AI Agent, Output)
-   - Tap on the canvas to place the node
-   - Configure node properties by selecting it
+#### 2. AI Integration
+- **OpenAI**: GPT-4, GPT-3.5, DALL-E
+- **Anthropic**: Claude 3, Claude 2
+- **Google AI**: Gemini Pro, PaLM
+- **OpenClaw**: Platform integration
 
-3. **Connect Nodes**
-   - Tap the output connector on a node
-   - Tap the input connector on the target node
-   - Connections validate automatically
+#### 3. Monitoring Dashboard
+- **Live Tracking**: Real-time execution status
+- **Performance Metrics**: Response times, success rates
+- **Error Logging**: Detailed error reports
+- **Cost Tracking**: Credit usage per workflow
 
-4. **Save and Deploy**
-   - Tap "Save" to store locally
-   - Tap "Deploy" to push to OpenClaw and activate
+#### 4. Monetization
+- **Subscriptions**: $0 (Free), $9.99 (Premium), $49.99 (Enterprise)
+- **Credits**: Pay-as-you-go from $9.99 to $299.99
+- **Payment Methods**: Cards, Apple Pay, Google Pay
+- **Invoicing**: Automated invoice generation
 
-### Using Templates
+### Backend API Features
 
-1. Go to the "Templates" tab
-2. Browse available templates by category
-3. Tap a template to preview details
-4. Tap "Use Template" to create a new workflow from it
-5. Customize the workflow as needed
+#### 1. Authentication & Security
+- JWT-based authentication
+- Refresh token rotation
+- Password hashing (bcrypt)
+- Rate limiting
+- CORS protection
+- SQL injection prevention
 
-### Managing API Keys
+#### 2. Database Management
+- PostgreSQL with Prisma ORM
+- Type-safe queries
+- Automated migrations
+- Database seeding
+- Connection pooling
 
-1. Navigate to Settings → API Keys
-2. Select an AI provider (OpenAI, Anthropic, Google, OpenClaw)
-3. Tap "Add Key" and enter your API key
-4. Keys are encrypted and stored securely on your device
-5. Enable biometric authentication for extra security
+#### 3. Payment Processing
+- Stripe integration
+- Subscription management
+- Credit purchases
+- Webhook handling
+- Invoice generation
 
-### Purchasing Credits
+#### 4. Monitoring & Logging
+- Winston structured logging
+- Health check endpoints
+- Error tracking
+- Performance metrics
 
-1. Go to Settings → Credits
-2. View your current balance
-3. Select a credit package (100 - 5,000 credits)
-4. Add a payment method or use an existing one
-5. Confirm purchase
-6. Credits are added instantly
+## 🚀 Quick Start
 
-### Managing Subscription
+### Prerequisites
+- Node.js 18+
+- PostgreSQL 14+
+- Redis 7+
+- Stripe account
+- Expo CLI
 
-1. Navigate to Settings → Subscription
-2. View current plan and features
-3. Select a different tier to upgrade/downgrade
-4. Confirm payment details
-5. Changes take effect immediately
+### Mobile App Setup
 
-### Monitoring Agents
+```bash
+# Clone repository
+git clone https://github.com/wuweillove/agentforge-mobile.git
+cd agentforge-mobile
 
-1. Navigate to "Monitor" tab
-2. View active agents and their status
-3. Tap an agent for detailed metrics
-4. Check execution logs and error reports
-5. Track resource usage and costs
+# Install dependencies
+npm install
 
-## 💳 Monetization Details
+# Configure environment
+cp .env.example .env
+# Edit .env with your API keys
 
-### Subscription Pricing
+# Start Expo development server
+npm start
 
-| Tier | Price | Workflows | Nodes | API Calls | Storage | Support |
-|------|-------|-----------|-------|-----------|---------|---------|
-| Free | $0 | 3 | 10/workflow | 100/mo | 100MB | Community |
-| Premium | $9.99/mo | Unlimited | 50/workflow | 10K/mo | 10GB | Email |
-| Enterprise | $49.99/mo | Unlimited | Unlimited | Unlimited | 100GB | Priority |
+# Run on iOS
+npm run ios
+
+# Run on Android
+npm run android
+```
+
+### Backend Setup
+
+```bash
+# Navigate to backend
+cd backend
+
+# Install dependencies
+npm install
+
+# Setup environment
+cp .env.example .env
+# Edit .env with database and API credentials
+
+# Start database with Docker
+docker-compose up -d db redis
+
+# Run migrations
+npx prisma migrate dev
+
+# Seed database
+npm run seed
+
+# Start development server
+npm run dev
+```
+
+Server runs at `http://localhost:3000`
+
+### Production Deployment
+
+```bash
+# Build backend Docker image
+cd backend
+docker build -t agentforge-api:latest .
+
+# Start all services
+docker-compose up -d
+
+# Run migrations
+docker-compose exec app npx prisma migrate deploy
+```
+
+## 💳 Monetization System
+
+### Subscription Tiers
+
+| Feature | Free | Premium ($9.99/mo) | Enterprise ($49.99/mo) |
+|---------|------|-------------------|----------------------|
+| Workflows | 3 | Unlimited | Unlimited |
+| Nodes/Workflow | 10 | 50 | Unlimited |
+| API Calls/Month | 100 | 10,000 | Unlimited |
+| Storage | 100MB | 10GB | 100GB |
+| Support | Community | Email | Priority |
+| Analytics | ❌ | ✅ | ✅ |
+| Collaboration | ❌ | ❌ | ✅ |
 
 ### Credit Packages
 
-| Package | Credits | Bonus | Price | Total |
-|---------|---------|-------|-------|-------|
+| Package | Credits | Bonus | Price | Total Credits |
+|---------|---------|-------|-------|---------------|
 | Starter | 100 | 0 | $9.99 | 100 |
 | Growth | 500 | 50 | $39.99 | 550 |
 | Pro | 1,000 | 150 | $69.99 | 1,150 |
@@ -286,142 +225,237 @@ agentforge-mobile/
 
 ### Credit Costs
 
-- Workflow Execution: 1 credit
-- Node Execution: 0.1 credit  
-- OpenAI API Call: 2 credits
-- Anthropic API Call: 3 credits
-- Google AI API Call: 2 credits
-- Storage (per MB): 0.01 credit
+- **Workflow Execution**: 1 credit
+- **Node Execution**: 0.1 credit
+- **OpenAI API Call**: 2 credits
+- **Anthropic API Call**: 3 credits
+- **Google AI API Call**: 2 credits
+- **Storage (per MB)**: 0.01 credit
+
+## 🔌 API Documentation
+
+### Authentication Endpoints
+
+```http
+POST   /api/auth/register        # Register new user
+POST   /api/auth/login           # Login
+POST   /api/auth/refresh         # Refresh token
+GET    /api/auth/me              # Get current user
+PUT    /api/auth/profile         # Update profile
+POST   /api/auth/change-password # Change password
+```
+
+### Credit Endpoints
+
+```http
+GET    /api/credits/balance      # Get balance
+GET    /api/credits/history      # Transaction history
+POST   /api/credits/purchase     # Purchase credits
+POST   /api/credits/usage/track  # Track usage
+GET    /api/credits/usage/stats  # Usage statistics
+```
+
+### Workflow Endpoints
+
+```http
+GET    /api/workflows            # List workflows
+POST   /api/workflows            # Create workflow
+GET    /api/workflows/:id        # Get workflow
+PUT    /api/workflows/:id        # Update workflow
+DELETE /api/workflows/:id        # Delete workflow
+POST   /api/workflows/:id/deploy # Deploy workflow
+```
+
+Full API documentation: [API.md](./docs/API.md)
+
+## 🗄️ Database Schema
+
+### Core Tables
+
+- **users** - User accounts and authentication
+- **subscriptions** - Subscription management
+- **credits** - Credit balance tracking
+- **credit_transactions** - Transaction history
+- **workflows** - Workflow definitions
+- **executions** - Execution tracking
+- **api_keys** - Encrypted API key storage
+- **payment_methods** - Saved payment methods
+- **invoices** - Invoice records
+- **usage_logs** - Usage analytics
+
+See [Prisma Schema](./backend/prisma/schema.prisma) for complete details.
 
 ## 🔒 Security Features
 
-### Encryption
-- AES-256 encryption for API keys
-- Encrypted local storage for sensitive data
-- Secure HTTPS communication only
+### Frontend Security
+- ✅ Secure storage (Expo SecureStore)
+- ✅ AES-256 encryption for API keys
+- ✅ Biometric authentication (Face ID/Touch ID)
+- ✅ HTTPS-only communication
+- ✅ No sensitive data in logs
 
-### Authentication
-- JWT-based authentication
-- Biometric authentication (Face ID/Touch ID)
-- Automatic token refresh
-- Secure session management
+### Backend Security
+- ✅ JWT authentication
+- ✅ Password hashing (bcrypt)
+- ✅ SQL injection prevention (Prisma)
+- ✅ Rate limiting (100 req/15min)
+- ✅ CORS protection
+- ✅ Helmet.js security headers
+- ✅ Input validation
+- ✅ Environment variable management
 
-### Payment Security
-- PCI DSS compliant (via Stripe)
-- No card data stored on device
-- 3D Secure support
-- Fraud detection
+## 📊 Monitoring & Analytics
 
-### Privacy
-- GDPR compliant
-- Data export available
-- Account deletion removes all data
-- Privacy policy included
+### Health Checks
+- `GET /health` - Overall health status
+- `GET /health/ready` - Readiness probe
+- `GET /health/live` - Liveness probe
 
-## 🚀 Backend Setup
+### Logging
+- Structured JSON logging with Winston
+- Log rotation (5MB files, 5 max)
+- Error tracking and reporting
+- Request/response logging
 
-See [BACKEND.md](./BACKEND.md) for complete backend API documentation including:
-- API endpoints
-- Database schema
-- Stripe integration
-- Webhook handlers
-- Deployment guides
-
-Quick start:
-```bash
-# Clone backend starter
-git clone https://github.com/agentforge/backend-api
-cd backend-api
-
-# Install dependencies
-npm install
-
-# Setup environment
-cp .env.example .env
-# Edit .env with your credentials
-
-# Run migrations
-npm run migrate
-
-# Start server
-npm start
-```
+### Metrics
+- User registration and login rates
+- Subscription conversions
+- Credit purchases and usage
+- Workflow execution statistics
+- API response times
 
 ## 🧪 Testing
 
-### Unit Tests
+### Backend Tests
+
 ```bash
+cd backend
+
+# Run all tests
 npm test
+
+# Run with coverage
+npm test -- --coverage
+
+# Watch mode
+npm run test:watch
 ```
 
-### Stripe Test Cards
-- Success: `4242 4242 4242 4242`
-- Declined: `4000 0000 0000 0002`
-- Requires Auth: `4000 0025 0000 3155`
+### Frontend Tests
 
-### Test Mode
-All Stripe features work in test mode without real charges. Use test API keys:
-```env
-STRIPE_PUBLISHABLE_KEY=pk_test_...
-```
-
-## 📦 Building for Production
-
-### Create production build
 ```bash
-expo build:android
-expo build:ios
+# Run tests
+npm test
+
+# Watch mode
+npm run test:watch
 ```
 
-### Using EAS Build (Recommended)
+## 📱 Mobile App Build
+
+### iOS Build
+
 ```bash
-npm install -g eas-cli
-eas login
-eas build --platform android
+# Development build
+expo build:ios -t simulator
+
+# Production build
 eas build --platform ios
 ```
 
-### Environment Setup
-1. Update `app.json` with production settings
-2. Configure Stripe production keys
-3. Set production API URLs
-4. Enable analytics tracking
+### Android Build
 
-## 📊 Analytics & Monitoring
+```bash
+# Development build
+expo build:android -t apk
 
-### Integrated Analytics
-- User activity tracking
-- Workflow execution metrics
-- Error monitoring
-- Revenue tracking
-- Conversion funnels
+# Production build
+eas build --platform android
+```
 
-### Admin Dashboard Access
-Admin users can access comprehensive analytics:
-- Monthly Recurring Revenue (MRR)
-- User growth and churn
-- Subscription distribution
-- Credit purchase trends
-- Transaction history
+## 🚢 Deployment Options
+
+### Backend Deployment
+
+#### Docker (Recommended)
+```bash
+docker-compose up -d
+```
+
+#### Vercel
+```bash
+vercel --prod
+```
+
+#### Railway
+```bash
+railway up
+```
+
+#### Heroku
+```bash
+git push heroku main
+```
+
+### Mobile App Deployment
+
+#### iOS (App Store)
+1. Configure app signing in Xcode
+2. Build with `eas build --platform ios`
+3. Submit to App Store Connect
+4. Wait for review approval
+
+#### Android (Google Play)
+1. Configure signing in `app.json`
+2. Build with `eas build --platform android`
+3. Upload to Google Play Console
+4. Submit for review
+
+## 🛠️ Development Workflow
+
+1. **Create Feature Branch**
+   ```bash
+   git checkout -b feature/new-feature
+   ```
+
+2. **Make Changes**
+   - Write code
+   - Add tests
+   - Update docs
+
+3. **Test Locally**
+   ```bash
+   npm run dev
+   npm test
+   ```
+
+4. **Commit & Push**
+   ```bash
+   git add .
+   git commit -m "feat: add new feature"
+   git push origin feature/new-feature
+   ```
+
+5. **Create Pull Request**
+
+## 📚 Documentation
+
+- [Backend Documentation](./BACKEND_COMPLETE.md)
+- [Monetization Guide](./MONETIZATION.md)
+- [API Documentation](./BACKEND.md)
+- [Deployment Guide](./docs/DEPLOYMENT.md)
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these steps:
+Contributions welcome! Please:
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
 
-### Development Guidelines
-- Follow React Native best practices
-- Write meaningful commit messages
-- Add tests for new features
-- Update documentation
-- Ensure code is properly formatted
-
-## 🗺 Roadmap
+## 📈 Roadmap
 
 - [x] Visual workflow builder
 - [x] Template system
@@ -431,77 +465,93 @@ Contributions are welcome! Please follow these steps:
 - [x] Payment processing
 - [x] API key management
 - [x] Admin dashboard
-- [ ] Multi-user collaboration
-- [ ] Cloud workflow sync
-- [ ] Advanced node types (ML models, webhooks)
-- [ ] Workflow versioning
-- [ ] Export/import workflows
-- [ ] Dark/light theme toggle
-- [ ] Offline mode with sync
-- [ ] Widget support
+- [x] Complete backend API
+- [x] Docker deployment
+- [ ] WebSocket real-time updates
+- [ ] Team collaboration features
+- [ ] Workflow marketplace
+- [ ] Advanced analytics
+- [ ] Mobile offline mode
 - [ ] Voice commands
-- [ ] AR workflow visualization
-- [ ] Team plans with user seats
-- [ ] White-label enterprise solution
+- [ ] AR visualization
+- [ ] White-label solution
+
+## 💰 Revenue Potential
+
+### Projected Monthly Recurring Revenue (MRR)
+
+| Users | 30% Premium | 10% Enterprise | Monthly MRR |
+|-------|-------------|----------------|-------------|
+| 1,000 | $2,997 | $499 | $3,496 |
+| 5,000 | $14,985 | $2,495 | $17,480 |
+| 10,000 | $29,970 | $4,990 | $34,960 |
+| 50,000 | $149,850 | $24,950 | $174,800 |
+
+Plus credit purchases (estimated 20-30% additional revenue)
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-**Metro bundler not starting**
+**Backend won't start**
 ```bash
+# Check database connection
+docker-compose ps
+
+# View logs
+docker-compose logs app
+
+# Restart services
+docker-compose restart
+```
+
+**Mobile app build fails**
+```bash
+# Clear cache
+rm -rf node_modules
+npm install
+
+# Reset Metro bundler
 npm start -- --reset-cache
 ```
 
-**iOS build fails**
+**Database issues**
 ```bash
-cd ios && pod install && cd ..
+# Reset database (development only)
+npx prisma migrate reset
+
+# Regenerate Prisma client
+npx prisma generate
 ```
-
-**Android build fails**
-```bash
-cd android && ./gradlew clean && cd ..
-```
-
-**Stripe payment not working**
-- Verify you're using correct publishable key
-- Check Stripe dashboard for webhook configuration
-- Ensure backend API is running
-- Test with Stripe test cards first
-
-**API keys not saving**
-- Check device biometric settings
-- Verify Expo SecureStore is properly installed
-- Try reinstalling the app
-
-## 📄 License
-
-MIT License - See LICENSE file for details
-
-## 🙏 Acknowledgments
-
-- OpenClaw platform for agent orchestration
-- React Native community
-- Expo team for excellent tooling
-- Stripe for payment infrastructure
-- All contributors and supporters
 
 ## 📞 Support
 
-- 📧 Email: support@agentforge.io
-- 🐛 Issues: [GitHub Issues](https://github.com/wuweillove/agentforge-mobile/issues)
-- 📖 Docs: [Documentation](https://docs.agentforge.io)
-- 💬 Discord: [Community Server](https://discord.gg/agentforge)
-- 🐦 Twitter: [@AgentForgeApp](https://twitter.com/AgentForgeApp)
+- 📧 **Email**: support@agentforge.io
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/wuweillove/agentforge-mobile/issues)
+- 📖 **Documentation**: [docs.agentforge.io](https://docs.agentforge.io)
+- 💬 **Discord**: [Join Community](https://discord.gg/agentforge)
+- 🐦 **Twitter**: [@AgentForgeApp](https://twitter.com/AgentForgeApp)
 
-## 💼 Business
+## 📄 License
 
-For enterprise inquiries:
-- Email: enterprise@agentforge.io
-- Schedule demo: [calendly.com/agentforge](https://calendly.com/agentforge)
+MIT License - see [LICENSE](./LICENSE) file for details
+
+## 🙏 Acknowledgments
+
+- React Native & Expo teams
+- Prisma for excellent ORM
+- Stripe for payment infrastructure
+- OpenClaw platform
+- All contributors and supporters
 
 ---
 
 **Built with ❤️ by Sebastian Llovera Studio**
 
 © 2026 AgentForge. All rights reserved.
+
+## ⭐ Star Us!
+
+If you find this project useful, please star it on GitHub! It helps others discover the project.
+
+[⭐ Star on GitHub](https://github.com/wuweillove/agentforge-mobile)
