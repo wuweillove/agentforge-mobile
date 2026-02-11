@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import StorageService from '../services/StorageService';
+import { generateId } from '../utils/helpers';
 
 export const useWorkflowStore = create((set, get) => ({
   workflows: [],
@@ -20,21 +21,26 @@ export const useWorkflowStore = create((set, get) => ({
   // Add new workflow
   addWorkflow: async (workflow) => {
     const newWorkflow = {
-      ...workflow,
-      id: workflow.id || Date.now().toString(),
+      id: workflow.id || generateId(),
+      name: workflow.name,
+      description: workflow.description || '',
+      nodes: workflow.nodes || [],
+      connections: workflow.connections || [],
+      status: workflow.status || 'draft',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      status: workflow.status || 'draft',
+      ...workflow,
     };
 
     const workflows = [...get().workflows, newWorkflow];
     set({ workflows });
     await StorageService.saveWorkflows(workflows);
+    return newWorkflow;
   },
 
-  // Update existing workflow
+  // Update workflow
   updateWorkflow: async (id, updates) => {
-    const workflows = get().workflows.map((workflow) =>
+    const workflows = get().workflows.map(workflow =>
       workflow.id === id
         ? { ...workflow, ...updates, updatedAt: new Date().toISOString() }
         : workflow
@@ -45,26 +51,36 @@ export const useWorkflowStore = create((set, get) => ({
 
   // Delete workflow
   deleteWorkflow: async (id) => {
-    const workflows = get().workflows.filter(
-      (workflow) => workflow.id !== id
-    );
+    const workflows = get().workflows.filter(workflow => workflow.id !== id);
     set({ workflows });
     await StorageService.saveWorkflows(workflows);
   },
 
   // Get workflow by ID
   getWorkflow: (id) => {
-    return get().workflows.find((workflow) => workflow.id === id);
+    return get().workflows.find(workflow => workflow.id === id);
   },
 
   // Clear all workflows
   clearWorkflows: async () => {
     set({ workflows: [] });
-    await StorageService.clearWorkflows();
+    await StorageService.saveWorkflows([]);
   },
 
-  // Filter workflows by status
-  getWorkflowsByStatus: (status) => {
-    return get().workflows.filter((workflow) => workflow.status === status);
+  // Duplicate workflow
+  duplicateWorkflow: async (id) => {
+    const workflow = get().getWorkflow(id);
+    if (!workflow) return null;
+
+    const duplicate = {
+      ...workflow,
+      id: generateId(),
+      name: `${workflow.name} (Copy)`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      status: 'draft',
+    };
+
+    return get().addWorkflow(duplicate);
   },
 }));
