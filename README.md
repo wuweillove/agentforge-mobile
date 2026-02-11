@@ -546,7 +546,7 @@ MIT License - see [LICENSE](./LICENSE) file for details
 
 ---
 
-**Built with ❤️ by Sebastian Llovera Studio**
+**Built with ❤️ by wuweillove**
 
 © 2026 AgentForge. All rights reserved.
 
