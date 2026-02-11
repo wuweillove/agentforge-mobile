@@ -1,0 +1,140 @@
+name: Backend Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  test:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+      
+      - name: Run tests
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+          JWT_SECRET: test_secret
+        run: npm test
+  
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/agentforge-api:latest
+            ${{ secrets.DOCKER_USERNAME }}/agentforge-api:${{ github.sha }}
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/agentforge-api:latest
+          cache-to: type=inline
+  
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/develop' || github.event.inputs.environment == 'staging'
+    environment:
+      name: staging
+      url: https://api-staging.agentforge.io
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to Railway (Staging)
+        run: |
+          npm i -g @railway/cli
+          railway up --service agentforge-api-staging
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_STAGING }}
+  
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event.inputs.environment == 'production'
+    environment:
+      name: production
+      url: https://api.agentforge.io
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to Railway (Production)
+        run: |
+          npm i -g @railway/cli
+          railway up --service agentforge-api-production
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PRODUCTION }}
+      
+      - name: Run database migrations
+        run: |
+          railway run --service agentforge-api-production "npx prisma migrate deploy"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PRODUCTION }}
+      
+      - name: Health check
+        run: |
+          sleep 30
+          curl --fail https://api.agentforge.io/health || exit 1
+      
+      - name: Notify deployment
+        uses: 8398a7/action-slack@v3
+        if: always()
+        with:
+          status: ${{ job.status }}
+          text: 'Backend deployment to production: ${{ job.status }}'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
