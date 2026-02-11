@@ -1,54 +1,40 @@
 # Assets Directory
 
-This directory contains all static assets for the AgentForge mobile app.
+This directory contains all the image assets for the AgentForge mobile app.
 
-## Directory Structure
+## Required Assets
 
-```
-assets/
-├── icon.png              # App icon (1024x1024)
-├── splash.png            # Splash screen (1242x2436)
-├── adaptive-icon.png     # Android adaptive icon (1024x1024)
-├── favicon.png           # Web favicon (48x48)
-└── images/              # Additional images
-    ├── onboarding/
-    ├── illustrations/
-    └── icons/
-```
+### App Icons
+- `icon.png` (1024x1024) - Main app icon
+- `adaptive-icon.png` (1024x1024) - Android adaptive icon
+- `favicon.png` (48x48) - Web favicon
+
+### Splash Screen
+- `splash.png` (2048x2048) - App splash screen
 
 ## Asset Guidelines
 
-### App Icon
-- **Size**: 1024x1024 px
-- **Format**: PNG with transparency
-- **Design**: Simple, recognizable logo on dark background
+### Icon Requirements
+- Format: PNG with transparency
+- Size: 1024x1024 pixels
+- Design: Should work on both light and dark backgrounds
+- Style: Modern, minimalist, representing AI/automation
 
-### Splash Screen
-- **Size**: 1242x2436 px (iPhone 12 Pro Max)
-- **Format**: PNG
-- **Background**: #1a1a2e (matches app theme)
+### Color Scheme
+- Primary: #6C5CE7 (Purple)
+- Secondary: #00B894 (Green)
+- Accent: #FDCB6E (Yellow)
+- Background: #1a1a2e (Dark Blue)
 
-### Adaptive Icon (Android)
-- **Size**: 1024x1024 px
-- **Safe Zone**: 66% diameter circle in center
-- **Format**: PNG with transparency
+## Generating Assets
 
-### Images
-- Use optimized PNG or WebP format
-- Keep file sizes under 200KB when possible
-- Use SVG for icons and simple graphics
+You can use tools like:
+- Figma/Sketch for design
+- [App Icon Generator](https://appicon.co/) for generating all sizes
+- [Splash Screen Generator](https://apetools.webprofusion.com/app/#/tools/imagegorilla) for splash screens
 
 ## Adding New Assets
 
-1. Place assets in appropriate subdirectory
-2. Use descriptive, lowercase names with hyphens
-3. Document usage in this README
-4. Update `app.json` if needed for app icons/splash
-
-## Icon Sets
-
-The app uses React Native Vector Icons with the following sets:
-- MaterialCommunityIcons (primary)
-- Ionicons (secondary)
-
-No need to add icon files manually for these.
+1. Add image files to this directory
+2. Update `app.json` if changing app icons
+3. For SVG icons, use `react-native-svg` components in `/src/components/`
