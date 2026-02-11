@@ -6,22 +6,22 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { Portal, Modal, IconButton } from 'react-native-paper';
+import { Portal, Modal } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { NODE_TYPES } from '../utils/constants';
 import { generateId } from '../utils/helpers';
+import { NODE_TYPES } from '../utils/constants';
 
 const NodePalette = ({ workflow, onWorkflowChange }) => {
   const [visible, setVisible] = useState(false);
 
-  const handleAddNode = (nodeType) => {
+  const addNode = (nodeType) => {
     const newNode = {
       id: generateId(),
       type: nodeType.type,
       label: nodeType.label,
       position: {
-        x: 100 + workflow.nodes.length * 30,
-        y: 100 + workflow.nodes.length * 30,
+        x: 100 + workflow.nodes.length * 50,
+        y: 100 + workflow.nodes.length * 50,
       },
       config: nodeType.defaultConfig || {},
     };
@@ -30,57 +30,46 @@ const NodePalette = ({ workflow, onWorkflowChange }) => {
       ...workflow,
       nodes: [...workflow.nodes, newNode],
     });
-
     setVisible(false);
   };
 
   return (
     <>
-      <IconButton
-        icon="plus-box"
-        size={32}
-        iconColor="#6C5CE7"
+      <TouchableOpacity
         style={styles.fabButton}
         onPress={() => setVisible(true)}
-      />
+      >
+        <Icon name="plus" size={24} color="#fff" />
+      </TouchableOpacity>
 
       <Portal>
         <Modal
           visible={visible}
           onDismiss={() => setVisible(false)}
-          contentContainerStyle={styles.modal}
+          contentContainerStyle={styles.modalContent}
         >
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Add Node</Text>
-            <IconButton
-              icon="close"
-              size={24}
-              iconColor="#fff"
-              onPress={() => setVisible(false)}
-            />
+          <View style={styles.header}>
+            <Text style={styles.title}>Add Node</Text>
+            <TouchableOpacity onPress={() => setVisible(false)}>
+              <Icon name="close" size={24} color="#fff" />
+            </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.nodeList}>
             {NODE_TYPES.map((nodeType) => (
               <TouchableOpacity
                 key={nodeType.type}
-                style={styles.nodeItem}
-                onPress={() => handleAddNode(nodeType)}
+                style={styles.nodeCard}
+                onPress={() => addNode(nodeType)}
               >
-                <View
-                  style={[
-                    styles.nodeIcon,
-                    { backgroundColor: nodeType.color },
-                  ]}
-                >
+                <View style={[styles.nodeIcon, { backgroundColor: nodeType.color }]}>
                   <Icon name={nodeType.icon} size={24} color="#fff" />
                 </View>
                 <View style={styles.nodeInfo}>
                   <Text style={styles.nodeLabel}>{nodeType.label}</Text>
-                  <Text style={styles.nodeDescription}>
-                    {nodeType.description}
-                  </Text>
+                  <Text style={styles.nodeDescription}>{nodeType.description}</Text>
                 </View>
+                <Icon name="plus-circle" size={24} color="#6C5CE7" />
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -95,36 +84,45 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     left: 20,
-    backgroundColor: '#16213e',
-    borderRadius: 8,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#6C5CE7',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
-  modal: {
+  modalContent: {
     backgroundColor: '#16213e',
     margin: 20,
     borderRadius: 12,
     maxHeight: '80%',
   },
-  modalHeader: {
+  header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 15,
+    padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#0f3460',
   },
-  modalTitle: {
+  title: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#fff',
   },
   nodeList: {
     padding: 15,
   },
-  nodeItem: {
+  nodeCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
     backgroundColor: '#1a1a2e',
+    padding: 15,
     borderRadius: 8,
     marginBottom: 10,
   },
@@ -146,7 +144,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   nodeDescription: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#8899A6',
   },
 });

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Card, Button, Chip } from 'react-native-paper';
+import { Card } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const TemplateCard = ({ template, onUse }) => {
@@ -14,59 +14,52 @@ const TemplateCard = ({ template, onUse }) => {
     return colors[category] || '#8899A6';
   };
 
+  const getCategoryIcon = (category) => {
+    const icons = {
+      'Data Processing': 'database',
+      'Communication': 'message',
+      'Analysis': 'chart-line',
+      'Automation': 'robot',
+    };
+    return icons[category] || 'file';
+  };
+
   return (
     <Card style={styles.card}>
       <Card.Content>
         <View style={styles.header}>
-          <View
-            style={[
-              styles.iconContainer,
-              { backgroundColor: getCategoryColor(template.category) },
-            ]}
-          >
-            <Icon name={template.icon} size={24} color="#fff" />
+          <View style={[
+            styles.categoryBadge,
+            { backgroundColor: getCategoryColor(template.category) }
+          ]}>
+            <Icon
+              name={getCategoryIcon(template.category)}
+              size={16}
+              color="#fff"
+            />
           </View>
-          <Chip
-            style={[
-              styles.categoryChip,
-              { backgroundColor: getCategoryColor(template.category) + '20' },
-            ]}
-            textStyle={{
-              color: getCategoryColor(template.category),
-              fontSize: 10,
-            }}
-          >
-            {template.category}
-          </Chip>
+          <Text style={styles.category}>{template.category}</Text>
         </View>
 
         <Text style={styles.title}>{template.name}</Text>
-        <Text style={styles.description} numberOfLines={3}>
-          {template.description}
-        </Text>
+        <Text style={styles.description}>{template.description}</Text>
 
         <View style={styles.stats}>
           <View style={styles.stat}>
             <Icon name="graph" size={14} color="#8899A6" />
-            <Text style={styles.statText}>{template.nodes.length} nodes</Text>
+            <Text style={styles.statText}>{template.nodes?.length || 0} nodes</Text>
           </View>
           <View style={styles.stat}>
-            <Icon name="download" size={14} color="#8899A6" />
-            <Text style={styles.statText}>{template.uses || 0} uses</Text>
+            <Icon name="clock-outline" size={14} color="#8899A6" />
+            <Text style={styles.statText}>{template.estimatedTime || '5'} min</Text>
           </View>
         </View>
-      </Card.Content>
 
-      <Card.Actions>
-        <Button
-          mode="contained"
-          onPress={onUse}
-          style={styles.useButton}
-          buttonColor="#6C5CE7"
-        >
-          Use Template
-        </Button>
-      </Card.Actions>
+        <TouchableOpacity style={styles.useButton} onPress={onUse}>
+          <Text style={styles.useButtonText}>Use Template</Text>
+          <Icon name="arrow-right" size={16} color="#fff" />
+        </TouchableOpacity>
+      </Card.Content>
     </Card>
   );
 };
@@ -78,34 +71,38 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  categoryBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 10,
   },
-  categoryChip: {
-    height: 24,
+  category: {
+    fontSize: 12,
+    color: '#8899A6',
+    textTransform: 'uppercase',
+    fontWeight: '600',
   },
   title: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#fff',
     marginBottom: 8,
   },
   description: {
     fontSize: 14,
     color: '#8899A6',
+    marginBottom: 15,
     lineHeight: 20,
-    marginBottom: 12,
   },
   stats: {
     flexDirection: 'row',
+    marginBottom: 15,
     gap: 15,
   },
   stat: {
@@ -118,7 +115,18 @@ const styles = StyleSheet.create({
     color: '#8899A6',
   },
   useButton: {
-    flex: 1,
+    backgroundColor: '#6C5CE7',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
+  useButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
 
